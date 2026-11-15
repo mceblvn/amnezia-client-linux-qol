@@ -27,6 +27,7 @@
 
 #include "core/controllers/updateController.h"
 #include "core/protocols/qmlRegisterProtocols.h"
+#include "core/theme/themeController.h"
 #include "logger.h"
 #include "ui/controllers/qml/pageController.h"
 #include "ui/models/installedAppsModel.h"
@@ -267,6 +268,9 @@ void AmneziaApplication::registerTypes()
 
     m_protocolProps.reset(new ProtocolProps());
     qmlRegisterSingletonInstance("ProtocolProps", 1, 0, "ProtocolProps", m_protocolProps.get());
+
+    auto *themeController = new ThemeController(m_settings, this);
+    qmlRegisterSingletonInstance("Theme", 1, 0, "Theme", themeController);
 
     qmlRegisterSingletonType(QUrl("qrc:/ui/qml/Filters/ContainersModelFilters.qml"), "ContainersModelFilters", 1, 0,
                              "ContainersModelFilters");

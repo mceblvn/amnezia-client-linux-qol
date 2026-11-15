@@ -27,6 +27,10 @@ set(HEADERS ${HEADERS}
     ${CLIENT_ROOT_DIR}/core/controllers/selfhosted/installController.h
     ${CLIENT_ROOT_DIR}/core/controllers/selfhosted/exportController.h
     ${CLIENT_ROOT_DIR}/core/controllers/selfhosted/importController.h
+    ${CLIENT_ROOT_DIR}/core/theme/themePalette.h
+    ${CLIENT_ROOT_DIR}/core/theme/themePalettes.cpp
+    ${CLIENT_ROOT_DIR}/core/theme/themeController.h
+    ${CLIENT_ROOT_DIR}/core/theme/themeController.cpp
     ${CLIENT_ROOT_DIR}/core/installers/installerBase.h
     ${CLIENT_ROOT_DIR}/core/installers/awgInstaller.h
     ${CLIENT_ROOT_DIR}/core/installers/wireguardInstaller.h

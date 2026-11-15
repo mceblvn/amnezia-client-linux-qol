@@ -2,72 +2,74 @@ pragma Singleton
 
 import QtQuick
 
+import Theme 1.0
+
 QtObject {
     property QtObject color: QtObject {
-        readonly property color transparent: 'transparent'
+        readonly property color transparent: Theme.palette.transparent
 
-        readonly property color textPrimary: '#FAFAFA'
-        readonly property color textSecondary: '#E4E4E7'
-        readonly property color textTertiary: '#A1A1AA'
-        readonly property color textQuaternary: '#86868F'
-        readonly property color textInverted: '#09090B'
-        readonly property color textAccent: '#FDBA74'
-        readonly property color textInfoInverse: '#0369A1'
-        readonly property color textStaticWhite: '#FFFFFF'
+        readonly property color textPrimary: Theme.palette.textPrimary
+        readonly property color textSecondary: Theme.palette.textSecondary
+        readonly property color textTertiary: Theme.palette.textTertiary
+        readonly property color textQuaternary: Theme.palette.textQuaternary
+        readonly property color textInverted: Theme.palette.textInverted
+        readonly property color textAccent: Theme.palette.textAccent
+        readonly property color textInfoInverse: Theme.palette.textInfoInverse
+        readonly property color textStaticWhite: Theme.palette.textStaticWhite
 
-        readonly property color bgBase: '#101012'
-        readonly property color bgSurface: '#18181B'
-        readonly property color bgSurfaceAlt: '#1F1F23'
-        readonly property color bgSheet: '#313136'
-        readonly property color bgPanel: '#3F3F46'
-        readonly property color bgPanelAlt: '#52525B'
-        readonly property color bgOverlay: '#8009090B'
-        readonly property color bgStateLayer: '#14FAFAFA'
-        readonly property color bgStateLayerPressed: '#1AFAFAFA'
-        readonly property color bgStateLayerAccent: '#14FDBA74'
-        readonly property color bgSurfaceInverse: '#E4E4E7'
-        readonly property color bgSurfaceInverseAlt: '#D4D4D8'
-        readonly property color bgControlTrack: '#1F1F23'
-        readonly property color bgField: '#1F1F23'
-        readonly property color bgSelected: '#1F1F23'
-        readonly property color bgAccentSubtle: '#4DD97706'
-        readonly property color bgStaticWhite: '#FFFFFF'
+        readonly property color bgBase: Theme.palette.bgBase
+        readonly property color bgSurface: Theme.palette.bgSurface
+        readonly property color bgSurfaceAlt: Theme.palette.bgSurfaceAlt
+        readonly property color bgSheet: Theme.palette.bgSheet
+        readonly property color bgPanel: Theme.palette.bgPanel
+        readonly property color bgPanelAlt: Theme.palette.bgPanelAlt
+        readonly property color bgOverlay: Theme.palette.bgOverlay
+        readonly property color bgStateLayer: Theme.palette.bgStateLayer
+        readonly property color bgStateLayerPressed: Theme.palette.bgStateLayerPressed
+        readonly property color bgStateLayerAccent: Theme.palette.bgStateLayerAccent
+        readonly property color bgSurfaceInverse: Theme.palette.bgSurfaceInverse
+        readonly property color bgSurfaceInverseAlt: Theme.palette.bgSurfaceInverseAlt
+        readonly property color bgControlTrack: Theme.palette.bgControlTrack
+        readonly property color bgField: Theme.palette.bgField
+        readonly property color bgSelected: Theme.palette.bgSelected
+        readonly property color bgAccentSubtle: Theme.palette.bgAccentSubtle
+        readonly property color bgStaticWhite: Theme.palette.bgStaticWhite
 
-        readonly property color bgAction: '#E4E4E7'
-        readonly property color bgActionHover: '#D4D4D8'
-        readonly property color bgActionPress: '#A1A1AA'
+        readonly property color bgAction: Theme.palette.bgAction
+        readonly property color bgActionHover: Theme.palette.bgActionHover
+        readonly property color bgActionPress: Theme.palette.bgActionPress
 
-        readonly property color borderFaint: '#313136'
-        readonly property color borderSoft: '#3F3F46'
-        readonly property color borderMedium: '#52525B'
-        readonly property color borderBold: '#A1A1AA'
-        readonly property color borderEmphasis: '#E4E4E7'
-        readonly property color borderAccent: '#FDBA74'
-        readonly property color borderField: '#52525B'
-        readonly property color borderFocus: '#E4E4E7'
+        readonly property color borderFaint: Theme.palette.borderFaint
+        readonly property color borderSoft: Theme.palette.borderSoft
+        readonly property color borderMedium: Theme.palette.borderMedium
+        readonly property color borderBold: Theme.palette.borderBold
+        readonly property color borderEmphasis: Theme.palette.borderEmphasis
+        readonly property color borderAccent: Theme.palette.borderAccent
+        readonly property color borderField: Theme.palette.borderField
+        readonly property color borderFocus: Theme.palette.borderFocus
 
-        readonly property color accentLight: '#FDBA74'
-        readonly property color accentDefault: '#F59E0B'
-        readonly property color accentDark: '#D97706'
-        readonly property color accentDeep: '#78350F'
+        readonly property color accentLight: Theme.palette.accentLight
+        readonly property color accentDefault: Theme.palette.accentDefault
+        readonly property color accentDark: Theme.palette.accentDark
+        readonly property color accentDeep: Theme.palette.accentDeep
 
-        readonly property color statusDestructive: '#F87171'
-        readonly property color statusWarning: '#EAB308'
-        readonly property color statusSuccess: '#4ADE80'
+        readonly property color statusDestructive: Theme.palette.statusDestructive
+        readonly property color statusWarning: Theme.palette.statusWarning
+        readonly property color statusSuccess: Theme.palette.statusSuccess
 
-        readonly property color promoRecommendation: '#A78BFA'
-        readonly property color promoUpdate: '#38BDF8'
-        readonly property color promoOverlay: '#148B5CF6'
-        readonly property color promoPink: '#DB2777'
-        readonly property color promoPinkDeep: '#9D174D'
+        readonly property color promoRecommendation: Theme.palette.promoRecommendation
+        readonly property color promoUpdate: Theme.palette.promoUpdate
+        readonly property color promoOverlay: Theme.palette.promoOverlay
+        readonly property color promoPink: Theme.palette.promoPink
+        readonly property color promoPinkDeep: Theme.palette.promoPinkDeep
 
-        readonly property color iconDefault: '#E4E4E7'
-        readonly property color iconSecondary: '#A1A1AA'
-        readonly property color iconTertiary: '#3F3F46'
-        readonly property color iconInverted: '#09090B'
+        readonly property color iconDefault: Theme.palette.iconDefault
+        readonly property color iconSecondary: Theme.palette.iconSecondary
+        readonly property color iconTertiary: Theme.palette.iconTertiary
+        readonly property color iconInverted: Theme.palette.iconInverted
 
-        readonly property color shadowLayer1: '#26000000'
-        readonly property color shadowLayer2: '#4D000000'
-        readonly property color shadowGlow: '#FBB751'
+        readonly property color shadowLayer1: Theme.palette.shadowLayer1
+        readonly property color shadowLayer2: Theme.palette.shadowLayer2
+        readonly property color shadowGlow: Theme.palette.shadowGlow
     }
 }
