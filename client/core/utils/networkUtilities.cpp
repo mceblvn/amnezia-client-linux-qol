@@ -1,5 +1,7 @@
 #include "networkUtilities.h"
 #include <QtNetwork/qnetworkinterface.h>
+#include <QByteArray>
+#include <cerrno>
 #include <cstddef>
 
 #ifdef Q_OS_WIN
@@ -291,7 +293,7 @@ QPair<QString, QNetworkInterface> NetworkUtilities::getGatewayAndIface()
     return { resGateway, QNetworkInterface::interfaceFromIndex(resIndex) };
 #endif
 #ifdef Q_OS_LINUX
-    constexpr int BUFFER_SIZE = 8192;
+    constexpr int BUFFER_SIZE = 16384;
     int     received_bytes = 0, msg_len = 0, route_attribute_len = 0;
     int     sock = -1, msgseq = 0;
     struct  nlmsghdr *nlh, *nlmsg;
@@ -299,8 +301,8 @@ QPair<QString, QNetworkInterface> NetworkUtilities::getGatewayAndIface()
     // This struct contain route attributes (route type)
     struct  rtattr *route_attribute;
     char    gateway_address[INET_ADDRSTRLEN], interface[IF_NAMESIZE];
-    char    msgbuf[100], buffer[BUFFER_SIZE];
-    char    *ptr = buffer;
+    char    msgbuf[100];
+    QByteArray buffer(BUFFER_SIZE, '\0');
     struct timeval tv;
 
     if ((sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) < 0) {
@@ -311,7 +313,6 @@ QPair<QString, QNetworkInterface> NetworkUtilities::getGatewayAndIface()
     memset(msgbuf, 0, sizeof(msgbuf));
     memset(gateway_address, 0, sizeof(gateway_address));
     memset(interface, 0, sizeof(interface));
-    memset(buffer, 0, sizeof(buffer));
 
     /* point the header and the msg structure pointers into the buffer */
     nlmsg = (struct nlmsghdr *)msgbuf;
@@ -329,45 +330,54 @@ QPair<QString, QNetworkInterface> NetworkUtilities::getGatewayAndIface()
     /* send msg */
     if (send(sock, nlmsg, nlmsg->nlmsg_len, 0) < 0) {
         perror("send failed");
+        close(sock);
         return {};
     }
 
     /* receive response */
-    do
+    while (true)
     {
-        received_bytes = recv(sock, ptr, sizeof(buffer) - msg_len, 0);
-        if (received_bytes < 0) {
-            perror("Error in recv");
-            return {};
+        if (msg_len == buffer.size()) {
+            buffer.resize(buffer.size() * 2);
         }
 
-        nlh = (struct nlmsghdr *) ptr;
+        received_bytes = recv(sock, buffer.data() + msg_len, buffer.size() - msg_len, 0);
+        if (received_bytes < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            perror("Error in recv");
+            close(sock);
+            return {};
+        }
+        if (received_bytes == 0) {
+            break;
+        }
+
+        nlh = (struct nlmsghdr *)(buffer.data() + msg_len);
 
         /* Check if the header is valid */
         if((NLMSG_OK(nlh, received_bytes) == 0) ||
             (nlh->nlmsg_type == NLMSG_ERROR))
         {
             perror("Error in received packet");
-            return {};
+            break;
         }
 
         /* If we received all data break */
         if (nlh->nlmsg_type == NLMSG_DONE)
             break;
-        else {
-            ptr += received_bytes;
-            msg_len += received_bytes;
-        }
+
+        msg_len += received_bytes;
 
         /* Break if its not a multi part message */
         if ((nlh->nlmsg_flags & NLM_F_MULTI) == 0)
             break;
     }
-    while ((nlh->nlmsg_seq != msgseq) || (nlh->nlmsg_pid != getpid()));
 
     /* parse response */
-    int remaining = msg_len + received_bytes;
-    nlh = (struct nlmsghdr *) buffer;
+    int remaining = msg_len;
+    nlh = (struct nlmsghdr *) buffer.data();
     for ( ; NLMSG_OK(nlh, remaining); nlh = NLMSG_NEXT(nlh, remaining))
     {
         /* Get the route data */

@@ -33,6 +33,7 @@ class LinuxRouteMonitor final : public QObject {
                     const IPAddress& prefix);
   QString m_ifname;
   unsigned int m_ifindex = 0;
+  QString m_gateway;
   int m_nlsock = -1;
   int m_nlseq = 0;
   QSocketNotifier* m_notifier = nullptr;
