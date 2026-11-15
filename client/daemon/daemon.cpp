@@ -210,6 +210,10 @@ bool Daemon::parseStringList(const QJsonObject& obj, const QString& name,
 }
 
 bool Daemon::addExclusionRoute(const IPAddress& prefix) {
+  if (prefix.type() == QAbstractSocket::UnknownNetworkLayerProtocol) {
+    logger.warning() << "Skipping invalid exclusion route" << prefix.toString();
+    return false;
+  }
   if (m_excludedAddrSet.contains(prefix)) {
     m_excludedAddrSet[prefix]++;
     return true;
@@ -222,7 +226,9 @@ bool Daemon::addExclusionRoute(const IPAddress& prefix) {
 }
 
 bool Daemon::delExclusionRoute(const IPAddress& prefix) {
-  Q_ASSERT(m_excludedAddrSet.contains(prefix));
+  if (!m_excludedAddrSet.contains(prefix)) {
+    return false;
+  }
   if (m_excludedAddrSet[prefix] > 1) {
     m_excludedAddrSet[prefix]--;
     return true;
