@@ -5,8 +5,8 @@ Item {
     readonly property string screenHome: "qrc:/ScreenHome.qml"
     readonly property string screenHomeIntroGifEx1: "qrc:/ScreenHomeIntroGifEx1.qml"
 
-    readonly property int screenWidth: 380
-    readonly property int screenHeight: 680
+    readonly property int screenWidth: 360
+    readonly property int screenHeight: 670
 
     readonly property int defaultMargin: 20
 
