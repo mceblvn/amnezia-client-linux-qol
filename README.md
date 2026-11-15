@@ -24,7 +24,7 @@ Linux-only.
 instant, survives a restart and recolours the whole interface.
 
 <p align="left">
-  <img src="docs/appearance.png" alt="Settings — Appearance" width="760">
+  <img src="docs/appearance.png" alt="Settings — Appearance" width="228">
 </p>
 
 
