@@ -92,6 +92,18 @@ PageType {
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
 
+                text: qsTr("Appearance")
+                icon.source: "qrc:/images/controls/eye.svg"
+                trailingIconSource: "qrc:/images/controls/chevron-right.svg"
+
+                onClicked: PageController.goToPage(PageEnum.PageSettingsAppearance)
+            }
+
+            ListItemType {
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+
                 visible: ServersUiController.hasServersFromGatewayApi
 
                 text: qsTr("News & Notifications")

@@ -9,6 +9,9 @@
         <file>Components/ServerListItem.qml</file>
         <file>Components/UpdateSupportDrawer.qml</file>
         <file>Components/PromoBanner.qml</file>
+        <file>Components/ThemePreviewCard.qml</file>
+        <file>Components/ThemeVariantCard.qml</file>
+        <file>Components/AccentSwatchGrid.qml</file>
         <file>Components/ConnectButton.qml</file>
         <file>Components/CountryListStickyHeader.qml</file>
         <file>Components/CountrySearchRow.qml</file>
@@ -141,6 +144,7 @@
         <file>Pages2/PageSettingsApiAvailableCountries.qml</file>
         <file>Pages2/PageSettingsApiServerInfo.qml</file>
         <file>Pages2/PageSettingsApplication.qml</file>
+        <file>Pages2/PageSettingsAppearance.qml</file>
         <file>Pages2/PageSettingsAppSplitTunneling.qml</file>
         <file>Pages2/PageSettingsBackup.qml</file>
         <file>Pages2/PageSettingsConnection.qml</file>
