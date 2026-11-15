@@ -1,18 +1,18 @@
 # AmneziaVPN Linux QoL
 
 Fork of [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client)
-with Linux quality-of-life changes: **themes with an accent picker and a light
-scheme**, a **native CLI inside the same GUI binary**, and a fix for site split
-tunneling that silently stopped installing routes.
+with Linux quality-of-life changes: **themes** with an accent picker and a light
+scheme, a **native CLI** inside the same GUI binary, and **a fix for site split**
+**tunneling** that silently stopped installing routes.
+
+<p align="center">
+  <img src="docs/amnezia-themes.png" alt="Themes!!" width="1080">
+</p>
 
 > Upstream readme and docs: [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client#readme),
 > [docs.amnezia.org](https://docs.amnezia.org).
 
-<p align="center">
-  <img src="docs/appearance.png" alt="Settings — Appearance" width="760">
-</p>
-
-**Linux only.** Built, packaged and tested on Linux. The CLI is not built or
+**Linux only.** Built, packaged and tested on Arch. The CLI is not built or
 packaged for macOS and Windows here, and `deploy/build_cli_package.sh` is
 Linux-only.
 
@@ -20,11 +20,13 @@ Linux-only.
 
 ### Themes
 
-Eleven palettes, twelve accent colours and a real light scheme. Switching is
-instant, survives a restart and recolours the whole interface: the design has
-**56 colour tokens**, all derived from **14 base colours** of a theme, so a
-preset is data rather than a second stylesheet. Every palette is checked
-against **WCAG AA** (4.5:1) by a test, including text on accent buttons.
+11 palettes, 12 accent colours and a light mode. Switching is
+instant, survives a restart and recolours the whole interface.
+
+<p align="left">
+  <img src="docs/appearance.png" alt="Settings — Appearance" width="760">
+</p>
+
 
 **Amnezia (default)** keeps the original look and adds two knobs:
 
@@ -32,21 +34,18 @@ against **WCAG AA** (4.5:1) by a test, including text on accent buttons.
 - **12 accents** — amber, orange, red, pink, purple, violet, indigo, blue, sky,
   teal, green, lime
 
-**Presets** are the whole look at once, no knobs:
+**Presets**:
 
-| Theme | Variants | Background | Accent |
-| --- | --- | --- | --- |
-| Catppuccin | Latte (light) · Mocha (dark) | `#EFF1F5` · `#1E1E2E` | `#8839EF` · `#CBA6F7` |
-| Dracula | Dracula (dark) · Alucard (light) | `#282A36` · `#FFFBEB` | `#BD93F9` · `#644AC9` |
-| Everforest | dark | `#272E33` | `#A7C080` |
-| Graphite Violet | dark | `#0D0D10` | `#8B5CF6` |
-| Kanagawa | dark | `#1F1F28` | `#7E9CD8` |
-| Nord | dark | `#2E3440` | `#88C0D0` |
-| Rosé Pine | Moon (dark) · Dawn (light) | `#232136` · `#FAF4ED` | `#C4A7E7` · `#907AA9` |
-| Tokyo Night | dark | `#1A1B26` | `#7AA2F7` |
+- Catppuccin Latte (light) / Mocha (dark)
+- Rosé Pine Moon (dark) / Dawn (light)
+- Dracula (dark) / Alucard (light)
+- Graphite Violet
+- Tokyo Night
+- Everforest
+- Kanagawa
+- Nord
 
-Families with a light variant sit side by side in the list; the rest take a full
-row. Adding a theme is one entry of fourteen colours in
+Adding a theme means one entry with 14 colours in
 `client/core/theme/themePalettes.cpp`.
 
 ### Native CLI
