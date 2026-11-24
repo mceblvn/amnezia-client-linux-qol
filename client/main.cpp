@@ -1,9 +1,10 @@
 #include <QDebug>
-#include <QTimer>
+#include <QJsonObject>
 #include <libssh/libssh.h>
 #include <openssl/ssl.h>
 
 #include "amneziaApplication.h"
+#include "cli/ipcProtocol.h"
 #include "core/utils/osSignalHandler.h"
 #include "core/utils/migrations.h"
 #include "core/utils/appUiConfig.h"
@@ -24,15 +25,22 @@ void anchorOpenSSL() {
 #endif
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) && !defined(MACOS_NE)
-bool isAnotherInstanceRunning()
+bool raiseRunningInstance()
 {
     QLocalSocket socket;
     socket.connectToServer(APP_INSTANCE_NAME);
-    if (socket.waitForConnected(500)) {
-        qWarning() << APPLICATION_NAME << "is already running";
-        return true;
+    if (!socket.waitForConnected(500)) {
+        return false;
     }
-    return false;
+
+    QJsonObject request;
+    request.insert(QLatin1String(amnezia::cli::kCmdKey), QLatin1String(amnezia::cli::kCmdRaise));
+    socket.write(amnezia::cli::encodeRequest(request));
+    socket.waitForBytesWritten(500);
+    socket.disconnectFromServer();
+
+    qWarning() << APPLICATION_NAME << "is already running, asked it to raise its window";
+    return true;
 }
 #endif
 
@@ -70,9 +78,8 @@ int main(int argc, char *argv[])
         }
         // connect with no primary instance: fall through and become primary.
         app.startLocalServer();
-    } else if (isAnotherInstanceRunning()) {
-        QTimer::singleShot(1000, &app, [&]() { app.quit(); });
-        return app.exec();
+    } else if (raiseRunningInstance()) {
+        return 0;
     } else {
         app.startLocalServer();
     }
