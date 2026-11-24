@@ -1,9 +1,15 @@
 # AmneziaVPN Linux QoL
 
 Fork of [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client)
-with Linux quality-of-life changes: **themes** with an accent picker and a light
-scheme, a **native CLI** inside the same GUI binary, and **a fix for site split**
-**tunneling** that silently stopped installing routes.
+with Linux quality-of-life changes:
+
+- **Themes** — 11 palettes, 12 accent colours and a light mode.
+- **Native CLI** inside the same GUI binary.
+- **Split tunneling** that no longer stops installing routes on large lists.
+- **Suspend and resume** that reconnects on wake instead of leaving a dead
+  tunnel.
+- **Tray and window** — the icon survives a shell restart, and launching the app
+  again raises the window.
 
 <p align="center">
   <img src="docs/amnezia-themes.png" alt="Themes!!" width="1080">
@@ -93,6 +99,22 @@ uses the same lookup.
 The fix grows the buffer, treats a full buffer as the end of the dump, caches
 the gateway for the session, skips empty endpoints, and deletes per-prefix
 routes instead of inserting them.
+
+### Suspend and resume
+
+NetworkManager reports the sleep transition as a wakeup, so the client tore the
+tunnel down while the machine was going to sleep and then ignored the real
+wakeup: the tunnel stayed dead while the GUI and the CLI reported a connection.
+
+The client reconnects on wake, retries a failed reconnection instead of giving
+up, and keeps the kill switch up while the tunnel is re-established. The daemon
+stops claiming a connection when the interface has no address, and
+NetworkManager leaves `amn0` alone so its address and routes survive the sleep.
+
+### Tray and window
+
+The tray icon re-registers when the status notifier host restarts, and launching
+the app again raises the existing window instead of silently exiting.
 
 ## Branches
 
