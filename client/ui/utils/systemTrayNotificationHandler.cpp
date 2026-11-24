@@ -15,6 +15,10 @@
 #include <QIcon>
 #include <QWindow>
 
+#ifdef Q_OS_LINUX
+#  include <QDBusConnection>
+#endif
+
 #include "version.h"
 
 SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
@@ -53,6 +57,20 @@ SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
     connect(&m_systemTrayIcon, &QSystemTrayIcon::activated, this,
             &SystemTrayNotificationHandler::onTrayActivated);
     m_systemTrayIcon.setContextMenu(&m_menu);
+
+#ifdef Q_OS_LINUX
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    bus.connect(QStringLiteral("org.kde.StatusNotifierWatcher"),
+                QStringLiteral("/StatusNotifierWatcher"),
+                QStringLiteral("org.kde.StatusNotifierWatcher"),
+                QStringLiteral("StatusNotifierHostRegistered"),
+                this, SLOT(onTrayHostRegistered()));
+    bus.connect(QStringLiteral("org.freedesktop.DBus"),
+                QStringLiteral("/org/freedesktop/DBus"),
+                QStringLiteral("org.freedesktop.DBus"),
+                QStringLiteral("NameOwnerChanged"),
+                this, SLOT(onTrayServiceOwnerChanged(QString,QString,QString)));
+#endif
 #endif
     setTrayState(Vpn::ConnectionState::Disconnected);
 }
@@ -94,6 +112,30 @@ void SystemTrayNotificationHandler::setTrayIcon(const QString &iconPath)
     m_systemTrayIcon.setIcon(trayIconMask);
 #endif
 }
+
+#ifdef Q_OS_LINUX
+void SystemTrayNotificationHandler::onTrayHostRegistered()
+{
+    refreshTrayIcon();
+}
+
+void SystemTrayNotificationHandler::onTrayServiceOwnerChanged(const QString &service,
+                                                              const QString &oldOwner,
+                                                              const QString &newOwner)
+{
+    Q_UNUSED(oldOwner)
+
+    if (service == QLatin1String("org.kde.StatusNotifierWatcher") && !newOwner.isEmpty()) {
+        refreshTrayIcon();
+    }
+}
+
+void SystemTrayNotificationHandler::refreshTrayIcon()
+{
+    m_systemTrayIcon.hide();
+    m_systemTrayIcon.show();
+}
+#endif
 
 void SystemTrayNotificationHandler::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {

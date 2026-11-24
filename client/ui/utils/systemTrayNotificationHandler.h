@@ -26,6 +26,12 @@ public:
 public slots:
     void updateWebsiteUrl(const QString &newWebsiteUrl);
 
+#ifdef Q_OS_LINUX
+private slots:
+    void onTrayHostRegistered();
+    void onTrayServiceOwnerChanged(const QString &service, const QString &oldOwner, const QString &newOwner);
+#endif
+
 protected:
     virtual void notify(Message type, const QString& title,
                         const QString& message, int timerMsec) override;
@@ -37,6 +43,10 @@ private:
     void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
     void setTrayIcon(const QString &iconPath);
+
+#ifdef Q_OS_LINUX
+    void refreshTrayIcon();
+#endif
 
 private:
     QMenu m_menu;
