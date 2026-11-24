@@ -26,6 +26,11 @@ class IPUtils : public QObject {
     qFatal("Have you forgotten to implement IPUtils::setMTUAndUp?");
     return false;
   };
+
+  virtual bool hasInterfaceAddress(const InterfaceConfig& config) {
+    Q_UNUSED(config);
+    return true;
+  };
 };
 
 #endif  // IPUTILS_H

@@ -15,6 +15,7 @@ class IPUtilsLinux final : public IPUtils {
   ~IPUtilsLinux();
   bool addInterfaceIPs(const InterfaceConfig& config) override;
   bool setMTUAndUp(const InterfaceConfig& config) override;
+  bool hasInterfaceAddress(const InterfaceConfig& config) override;
 
  private:
   bool addIP4AddressToDevice(const InterfaceConfig& config);

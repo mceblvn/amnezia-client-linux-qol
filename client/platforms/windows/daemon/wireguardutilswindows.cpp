@@ -138,7 +138,8 @@ bool WireguardUtilsWindows::addInterface(const InterfaceConfig& config) {
   return true;
 }
 
-bool WireguardUtilsWindows::deleteInterface() {
+bool WireguardUtilsWindows::deleteInterface(bool keepFirewall) {
+  Q_UNUSED(keepFirewall);
   if (m_routeMonitor) {
     m_routeMonitor->deleteLater();
   }

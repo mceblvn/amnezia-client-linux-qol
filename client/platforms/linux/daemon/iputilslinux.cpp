@@ -5,6 +5,7 @@
 #include "iputilslinux.h"
 
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -34,6 +35,37 @@ bool IPUtilsLinux::addInterfaceIPs(const InterfaceConfig& config) {
   bool ret = addIP4AddressToDevice(config);
   addIP6AddressToDevice(config);
   return ret;
+}
+
+bool IPUtilsLinux::hasInterfaceAddress(const InterfaceConfig& config) {
+  if (config.m_deviceIpv4Address.isEmpty()) {
+    return true;
+  }
+
+  struct ifaddrs* ifap = nullptr;
+  if (getifaddrs(&ifap) != 0) {
+    logger.warning() << "Failed to read the interface addresses.";
+    return true;
+  }
+  auto guard = qScopeGuard([&] { freeifaddrs(ifap); });
+
+  for (struct ifaddrs* ifa = ifap; ifa != nullptr; ifa = ifa->ifa_next) {
+    if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_INET) {
+      continue;
+    }
+    if (QString(ifa->ifa_name) != QString(WG_INTERFACE)) {
+      continue;
+    }
+
+    char buffer[INET_ADDRSTRLEN] = {0};
+    auto* sin = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr);
+    if (inet_ntop(AF_INET, &sin->sin_addr, buffer, sizeof(buffer)) &&
+        config.m_deviceIpv4Address == QLatin1String(buffer)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool IPUtilsLinux::setMTUAndUp(const InterfaceConfig& config) {

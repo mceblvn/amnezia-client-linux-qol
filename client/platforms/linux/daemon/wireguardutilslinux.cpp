@@ -205,7 +205,7 @@ bool WireguardUtilsLinux::addInterface(const InterfaceConfig& config) {
     return (err == 0);
 }
 
-bool WireguardUtilsLinux::deleteInterface() {
+bool WireguardUtilsLinux::deleteInterface(bool keepFirewall) {
     if (m_rtmonitor) {
         delete m_rtmonitor;
         m_rtmonitor = nullptr;
@@ -227,7 +227,9 @@ bool WireguardUtilsLinux::deleteInterface() {
     QFile::remove(wgRuntimeDir.filePath(QString(WG_INTERFACE) + ".name"));
 
     // double-check + ensure our firewall is installed and enabled
-    KillSwitch::instance()->disableKillSwitch();
+    if (!keepFirewall) {
+        KillSwitch::instance()->disableKillSwitch();
+    }
     return true;
 }
 

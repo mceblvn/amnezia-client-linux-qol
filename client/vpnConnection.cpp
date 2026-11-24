@@ -399,6 +399,11 @@ void VpnConnection::createProtocolConnections()
 {
     connect(m_vpnProtocol.data(), &VpnProtocol::protocolError, this, &VpnConnection::vpnProtocolError);
     connect(m_vpnProtocol.data(), &VpnProtocol::connectionStateChanged, this, &VpnConnection::setConnectionState);
+    connect(m_vpnProtocol.data(), &VpnProtocol::tunnelLost, this, [this]() {
+        if (m_connectionState == Vpn::ConnectionState::Connected) {
+            reconnectToVpn();
+        }
+    });
     connect(m_vpnProtocol.data(), SIGNAL(bytesChanged(quint64, quint64)), this, SLOT(onBytesChanged(quint64, quint64)));
 
 #ifdef AMNEZIA_DESKTOP
@@ -592,7 +597,9 @@ void VpnConnection::reconnectToVpn() {
     m_reconnectInProgress = true;
     setConnectionState(Vpn::ConnectionState::Reconnecting);
 
+    m_vpnProtocol->setKeepFirewallOnStop(true);
     m_vpnProtocol->stop();
+    m_vpnProtocol->setKeepFirewallOnStop(false);
     if (ErrorCode err = m_vpnProtocol->start(); err != ErrorCode::NoError) {
         m_reconnectInProgress = false;
         m_lastReconnectError = err;

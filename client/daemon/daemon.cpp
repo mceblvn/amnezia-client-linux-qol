@@ -70,6 +70,8 @@ bool Daemon::activate(const InterfaceConfig& config) {
   logger.debug() << "Activating interface";
   auto emit_failure_guard = qScopeGuard([this] { emit activationFailure(); });
 
+  m_activationTimer.start();
+
   if (m_connections.contains(config.m_hopType)) {
     if (supportServerSwitching(config)) {
       logger.debug() << "Already connected. Server switching supported.";
@@ -480,7 +482,7 @@ bool Daemon::parseConfig(const QJsonObject& obj, InterfaceConfig& config) {
   return true;
 }
 
-bool Daemon::deactivate(bool emitSignals) {
+bool Daemon::deactivate(bool emitSignals, bool keepFirewall) {
   Q_ASSERT(wgutils() != nullptr);
 
   // Deactivate the main interface.
@@ -519,7 +521,7 @@ bool Daemon::deactivate(bool emitSignals) {
 
   m_connections.clear();
   // Delete the interface
-  return wgutils()->deleteInterface();
+  return wgutils()->deleteInterface(keepFirewall);
 }
 
 QString Daemon::logs() {
@@ -604,6 +606,13 @@ QJsonObject Daemon::getStatus() {
   for (const WireguardUtils::PeerStatus& status : peers) {
     if (status.m_pubkey != connection.m_config.m_serverPublicKey) {
       continue;
+    }
+    if (supportIPUtils() && iputils() && m_activationTimer.isValid() &&
+        m_activationTimer.elapsed() > 3000 &&
+        !iputils()->hasInterfaceAddress(connection.m_config)) {
+      logger.warning() << "The interface has no address, reporting disconnected.";
+      json.insert("connected", QJsonValue(false));
+      return json;
     }
     json.insert("connected", QJsonValue(true));
     json.insert("serverIpv4Gateway",

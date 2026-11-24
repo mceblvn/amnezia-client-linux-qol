@@ -61,6 +61,8 @@ public:
     virtual ErrorCode start() = 0;
     virtual void stop() = 0;
 
+    void setKeepFirewallOnStop(bool keep) { m_keepFirewallOnStop = keep; }
+
     Vpn::ConnectionState connectionState() const;
     ErrorCode lastError() const;
     QString textConnectionState() const;
@@ -78,6 +80,7 @@ public:
 signals:
     void bytesChanged(quint64 receivedBytes, quint64 sentBytes);
     void connectionStateChanged(Vpn::ConnectionState state);
+    void tunnelLost();
     void timeoutTimerEvent();
     void protocolError(amnezia::ErrorCode e);
     void tunnelAddressesUpdated(const QString& gateway, const QString& localAddress);
@@ -96,6 +99,7 @@ protected:
     void resetStopGuard();
 
     bool m_stopped = false;
+    bool m_keepFirewallOnStop = false;
 
     Vpn::ConnectionState m_connectionState;
 

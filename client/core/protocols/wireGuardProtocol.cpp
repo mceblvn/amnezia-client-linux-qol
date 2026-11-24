@@ -44,6 +44,7 @@ WireguardProtocol::WireguardProtocol(const QJsonObject &configuration, QObject *
 
     connect(m_impl.get(), &ControllerImpl::disconnected, this,
             [this]() { setConnectionState(Vpn::ConnectionState::Disconnected); });
+    connect(m_impl.get(), &ControllerImpl::tunnelLost, this, &VpnProtocol::tunnelLost);
     m_impl->initialize(nullptr, nullptr);
 }
 
@@ -75,7 +76,7 @@ ErrorCode WireguardProtocol::startMzImpl()
 
 ErrorCode WireguardProtocol::stopMzImpl()
 {
-    m_impl->deactivate();
+    m_impl->deactivate(m_keepFirewallOnStop);
     return ErrorCode::NoError;
 }
 

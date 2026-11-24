@@ -56,6 +56,10 @@ LocalSocketController::LocalSocketController() {
   m_initializingTimer.setSingleShot(true);
   connect(&m_initializingTimer, &QTimer::timeout, this,
           &LocalSocketController::initializeInternal);
+
+  m_statusTimer.setInterval(10000);
+  connect(&m_statusTimer, &QTimer::timeout, this,
+          &LocalSocketController::checkStatus);
 }
 
 LocalSocketController::~LocalSocketController() {
@@ -264,7 +268,7 @@ void LocalSocketController::activate(const QJsonObject &rawConfig) {
   write(json);
 }
 
-void LocalSocketController::deactivate() {
+void LocalSocketController::deactivate(bool keepFirewall) {
   logger.debug() << "Deactivating";
 
   if (m_daemonState != eReady) {
@@ -275,6 +279,7 @@ void LocalSocketController::deactivate() {
 
   QJsonObject json;
   json.insert("type", "deactivate");
+  json.insert("keepFirewall", keepFirewall);
   write(json);
   emit disconnected();
 }
@@ -377,6 +382,7 @@ void LocalSocketController::parseCommand(const QByteArray& command) {
 
   if (m_daemonState == eInitializing && type == "status") {
     m_daemonState = eReady;
+    m_statusTimer.start();
 
     QJsonValue connected = obj.value("connected");
     if (!connected.isBool()) {
@@ -409,6 +415,10 @@ void LocalSocketController::parseCommand(const QByteArray& command) {
   }
 
   if (type == "status") {
+    if (!obj.value("connected").toBool(true)) {
+      emit tunnelLost();
+      return;
+    }
 
     QJsonValue serverIpv4Gateway = obj.value("serverIpv4Gateway");
     if (!serverIpv4Gateway.isString()) {

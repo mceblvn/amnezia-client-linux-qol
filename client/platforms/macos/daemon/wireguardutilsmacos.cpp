@@ -203,7 +203,8 @@ bool WireguardUtilsMacos::addInterface(const InterfaceConfig& config) {
   return (err == 0);
 }
 
-bool WireguardUtilsMacos::deleteInterface() {
+bool WireguardUtilsMacos::deleteInterface(bool keepFirewall) {
+  Q_UNUSED(keepFirewall);
   if (m_rtmonitor) {
     delete m_rtmonitor;
     m_rtmonitor = nullptr;

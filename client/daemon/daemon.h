@@ -6,6 +6,7 @@
 #define DAEMON_H
 
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QTimer>
 
 #include "daemon/daemonerrors.h"
@@ -33,7 +34,7 @@ class Daemon : public QObject {
   static bool parseConfig(const QJsonObject& obj, InterfaceConfig& config);
 
   virtual bool activate(const InterfaceConfig& config);
-  virtual bool deactivate(bool emitSignals = true);
+  virtual bool deactivate(bool emitSignals = true, bool keepFirewall = false);
   virtual QJsonObject getStatus();
 
   // Callback before any Activating measure is done
@@ -88,6 +89,7 @@ class Daemon : public QObject {
   QMap<InterfaceConfig::HopType, ConnectionState> m_connections;
   QHash<IPAddress, int> m_excludedAddrSet;
   QTimer m_handshakeTimer;
+  QElapsedTimer m_activationTimer;
 };
 
 #endif  // DAEMON_H

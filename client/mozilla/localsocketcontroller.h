@@ -26,7 +26,7 @@ class LocalSocketController final : public ControllerImpl {
 
   void activate(const QJsonObject& rawConfig) override;
 
-  void deactivate() override;
+  void deactivate(bool keepFirewall = false) override;
 
   void checkStatus() override;
 
@@ -64,6 +64,8 @@ class LocalSocketController final : public ControllerImpl {
 
   QTimer m_initializingTimer;
   uint32_t m_initializingRetry = 0;
+
+  QTimer m_statusTimer;
 };
 
 #endif  // LOCALSOCKETCONTROLLER_H

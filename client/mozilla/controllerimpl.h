@@ -42,7 +42,7 @@ class ControllerImpl : public QObject {
 
   // This method terminates the VPN tunnel. The VPN client is in
   // "disconnecting" state until the "disconnected" signal is received.
-  virtual void deactivate() = 0;
+  virtual void deactivate(bool keepFirewall = false) = 0;
 
   // This method is used to retrieve the VPN tunnel status (mainly the number
   // of bytes sent and received). It's called always when the VPN tunnel is
@@ -75,6 +75,10 @@ class ControllerImpl : public QObject {
   void connected(const QString& pubkey,
                  const QDateTime& connectionTimestamp = QDateTime());
   void disconnected();
+
+  // Emitted when the backend still reports a peer but the tunnel interface is
+  // no longer configured, so the connection must be re-established.
+  void tunnelLost();
 
   // This method should be emitted after a checkStatus() call.
   // "serverIpv4Gateway" is the current VPN tunnel gateway.
