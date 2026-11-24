@@ -60,6 +60,7 @@ if(LINUX AND NOT ANDROID)
         ${CMAKE_SOURCE_DIR}/deploy/data/linux/AmneziaVPN.desktop
         ${CMAKE_SOURCE_DIR}/deploy/data/linux/post_install.sh
         ${CMAKE_SOURCE_DIR}/deploy/data/linux/post_uninstall.sh
+        ${CMAKE_SOURCE_DIR}/deploy/data/linux/90-amnezia-unmanaged.conf
         DESTINATION "."
         COMPONENT AmneziaVPN
     )

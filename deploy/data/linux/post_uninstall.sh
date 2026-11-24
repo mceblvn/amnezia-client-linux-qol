@@ -83,6 +83,13 @@ fi
 if rmdir "$TARGET_HOME/.local/share/$ORG_NAME/$APP_NAME" 2>/dev/null; then :; fi
 if rmdir "$TARGET_HOME/.local/share/$ORG_NAME" 2>/dev/null; then :; fi
 
+if test -f /etc/NetworkManager/conf.d/90-amnezia-unmanaged.conf; then
+	sudo rm -f /etc/NetworkManager/conf.d/90-amnezia-unmanaged.conf >> $LOG_FILE
+	if sudo systemctl is-active --quiet NetworkManager; then
+		sudo systemctl reload NetworkManager >> $LOG_FILE
+	fi
+fi
+
 if command -v steamos-readonly &> /dev/null; then
 	sudo steamos-readonly enable >> $LOG_FILE
 	echo "steamos-readonly enabled" >> $LOG_FILE

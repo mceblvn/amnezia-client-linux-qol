@@ -46,6 +46,14 @@ sudo chmod 555 /usr/share/applications/$APP_NAME.desktop >> $LOG_FILE
 
 echo "user desktop creation loop ended" >> $LOG_FILE
 
+if [ -d /etc/NetworkManager/conf.d ]; then
+	sudo cp $APP_PATH/90-amnezia-unmanaged.conf /etc/NetworkManager/conf.d/ >> $LOG_FILE
+	if sudo systemctl is-active --quiet NetworkManager; then
+		sudo systemctl reload NetworkManager >> $LOG_FILE
+	fi
+	echo "NetworkManager unmanaged rule installed" >> $LOG_FILE
+fi
+
 if command -v steamos-readonly &> /dev/null; then
         sudo steamos-readonly enable >> $LOG_FILE
         echo "steamos-readonly enabled" >> $LOG_FILE
