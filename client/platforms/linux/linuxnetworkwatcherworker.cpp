@@ -37,7 +37,6 @@
 enum NMState {
     NM_STATE_UNKNOWN = 0,
     NM_STATE_ASLEEP = 10,
-    NM_STATE_DISABLED = 10,
     NM_STATE_DISCONNECTED = 20,
     NM_STATE_DISCONNECTING = 30,
     NM_STATE_CONNECTING = 40,
@@ -202,9 +201,17 @@ void LinuxNetworkWatcherWorker::NMStateChanged(quint32 state)
 {
     logger.debug() << "NMStateChanged " << state;
 
-    if (state == NM_STATE_ASLEEP || state == NM_STATE_DISABLED) {
+    if (state == NM_STATE_ASLEEP) {
+        m_wasAsleep = true;
+        return;
+    }
+
+    if (m_wasAsleep) {
+        m_wasAsleep = false;
         emit wakeup();
-    } else if (state == NM_STATE_CONNECTED_GLOBAL) {
+    }
+
+    if (state == NM_STATE_CONNECTED_GLOBAL) {
         emit networkChanged();
     }
 }
