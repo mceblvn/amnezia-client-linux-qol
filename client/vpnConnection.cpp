@@ -41,8 +41,25 @@ VpnConnection::VpnConnection(SecureServersRepository* serversRepository, SecureA
       m_serversRepository(serversRepository),
       m_appSettingsRepository(appSettingsRepository),
       m_checkTimer(this),
+      m_reconnectTimer(this),
+      m_reconnectWatchdog(this),
       m_connectionState(Vpn::ConnectionState::Disconnected)
 {
+    m_reconnectTimer.setSingleShot(true);
+    connect(&m_reconnectTimer, &QTimer::timeout, this, &VpnConnection::reconnectToVpn);
+
+    m_reconnectWatchdog.setSingleShot(true);
+    m_reconnectWatchdog.setInterval(20000);
+    connect(&m_reconnectWatchdog, &QTimer::timeout, this, [this]() {
+        if (m_connectionState != Vpn::ConnectionState::Reconnecting) {
+            return;
+        }
+
+        qWarning() << "Reconnect timed out, forcing a full reconnect";
+        m_reconnectInProgress = false;
+        reconnectToVpn();
+    });
+
 #if defined(Q_OS_IOS) || defined(MACOS_NE)
     m_checkTimer.setInterval(1000);
     connect(IosController::Instance(), &IosController::connectionStateChanged, this, &VpnConnection::setConnectionState);
@@ -559,21 +576,48 @@ void VpnConnection::reconnectToVpn() {
     if (m_vpnProtocol.isNull())
         return;
 
-    if (m_connectionState != Vpn::ConnectionState::Connected) {
+    if (m_connectionState != Vpn::ConnectionState::Connected
+            && m_connectionState != Vpn::ConnectionState::Reconnecting) {
         qWarning() << QString("Reconnect triggered on %1 during inappropriate state: %2; ignoring slot")
                               .arg(QMetaEnum::fromType<Vpn::ConnectionState>().valueToKey(m_connectionState));
         return;
     }
 
+    if (m_reconnectInProgress) {
+        return;
+    }
+
     qDebug() << "Reconnect triggered. Reconnecting to the server";
 
+    m_reconnectInProgress = true;
     setConnectionState(Vpn::ConnectionState::Reconnecting);
 
     m_vpnProtocol->stop();
     if (ErrorCode err = m_vpnProtocol->start(); err != ErrorCode::NoError) {
-        setConnectionState(Vpn::ConnectionState::Error);
-        emit vpnProtocolError(err);
+        m_reconnectInProgress = false;
+        m_lastReconnectError = err;
+        scheduleReconnect();
+        return;
     }
+
+    m_reconnectWatchdog.start();
+}
+
+void VpnConnection::scheduleReconnect() {
+    if (m_reconnectTimer.isActive())
+        return;
+
+    if (m_reconnectAttempts >= 6) {
+        setConnectionState(Vpn::ConnectionState::Error);
+        emit vpnProtocolError(m_lastReconnectError);
+        return;
+    }
+
+    const int delay = qMin(1000 << m_reconnectAttempts, 30000);
+    ++m_reconnectAttempts;
+
+    qWarning() << "Scheduling reconnect in" << delay << "ms";
+    m_reconnectTimer.start(delay);
 }
 
 void VpnConnection::disconnectFromVpn()
@@ -623,6 +667,15 @@ void VpnConnection::setConnectionState(Vpn::ConnectionState state) {
     } else if (state == Vpn::ConnectionState::Disconnected || state == Vpn::ConnectionState::Error) {
         m_connectedSince = QDateTime();
         m_connectedServerId.clear();
+    }
+
+    if (state == Vpn::ConnectionState::Connected
+            || state == Vpn::ConnectionState::Disconnected
+            || state == Vpn::ConnectionState::Error) {
+        m_reconnectAttempts = 0;
+        m_reconnectInProgress = false;
+        m_reconnectTimer.stop();
+        m_reconnectWatchdog.stop();
     }
 
     m_connectionState = state;

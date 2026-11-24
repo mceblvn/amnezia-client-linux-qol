@@ -90,6 +90,12 @@ private:
     // Only for iOS for now, check counters
     QTimer m_checkTimer;
 
+    QTimer m_reconnectTimer;
+    QTimer m_reconnectWatchdog;
+    int m_reconnectAttempts = 0;
+    bool m_reconnectInProgress = false;
+    ErrorCode m_lastReconnectError = ErrorCode::NoError;
+
 #ifdef Q_OS_ANDROID
    AndroidVpnProtocol* androidVpnProtocol = nullptr;
 
@@ -103,6 +109,8 @@ private:
    QString m_connectedServerId;
 
    void createProtocolConnections();
+
+   void scheduleReconnect();
 
    void appendSplitTunnelingConfig();
    void appendKillSwitchConfig();
